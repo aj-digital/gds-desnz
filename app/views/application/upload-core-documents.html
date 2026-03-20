@@ -1,0 +1,116 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName = "Upload core documents" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/application/task-list"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if coreDocsError %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: coreDocsErrorList
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-xl">Upload core documents</h1>
+
+    <p class="govuk-body">Upload the documents required for your compulsory purchase order.</p>
+
+    <form class="form" action="/application/upload-core-documents" method="post" novalidate id="upload-core-form">
+
+      {{ govukFileUpload({
+        label: { text: "Upload the made Compulsory Purchase Order (CPO)", classes: "govuk-label--m" },
+        hint: { text: "Upload one or more files. PDF, DOC or JPG, maximum 50MB per file." },
+        id: "coreOrderDocument",
+        name: "coreOrderDocument_file",
+        errorMessage: { text: "Upload the CPO document" } if coreDocsError and not data.coreOrderDocument,
+        attributes: { "data-sync-to": "coreOrderDocument" }
+      }) }}
+      <input type="hidden" name="coreOrderDocument" value="{{ data.coreOrderDocument or '' }}" />
+
+      {{ govukFileUpload({
+        label: { text: "Upload the order map or maps", classes: "govuk-label--m" },
+        hint: { text: "Upload one or more files. Ensure all maps match your schedule of interests." },
+        id: "coreMapDocument",
+        name: "coreMapDocument_file",
+        errorMessage: { text: "Upload the order map or maps" } if coreDocsError and not data.coreMapDocument,
+        attributes: { "data-sync-to": "coreMapDocument" }
+      }) }}
+      <input type="hidden" name="coreMapDocument" value="{{ data.coreMapDocument or '' }}" />
+
+      {{ govukFileUpload({
+        label: { text: "Upload the Statement of Reasons (SoR)", classes: "govuk-label--m" },
+        hint: { text: "PDF preferred, maximum 50MB" },
+        id: "coreStatementOfReasons",
+        name: "coreStatementOfReasons_file",
+        errorMessage: { text: "Upload the Statement of Reasons" } if coreDocsError and not data.coreStatementOfReasons,
+        attributes: { "data-sync-to": "coreStatementOfReasons" }
+      }) }}
+      <input type="hidden" name="coreStatementOfReasons" value="{{ data.coreStatementOfReasons or '' }}" />
+
+      {{ govukFileUpload({
+        label: { text: "Other core supporting documents (optional)", classes: "govuk-label--m" },
+        hint: { text: "Upload one or more files." },
+        id: "coreSupportingDocuments",
+        name: "coreSupportingDocuments_file",
+        attributes: { "data-sync-to": "coreSupportingDocuments" }
+      }) }}
+      <input type="hidden" name="coreSupportingDocuments" value="{{ data.coreSupportingDocuments or '' }}" />
+
+      {% set coreCheckValues = data.coreConfirmations if data.coreConfirmations else [] %}
+      {% if coreCheckValues is string %}
+        {% set coreCheckValues = [coreCheckValues] %}
+      {% endif %}
+
+      {{ govukCheckboxes({
+        name: "coreConfirmations",
+        fieldset: {
+          legend: { text: "Confirm", classes: "govuk-fieldset__legend--m" }
+        },
+        errorMessage: { text: "Confirm all three statements" } if coreDocsError and (coreCheckValues | length) < 3,
+        values: coreCheckValues,
+        items: [
+          { value: "orderSealed", text: "I confirm the order has been made and sealed." },
+          { value: "mapsAccompany", text: "I confirm the maps accompany the order." },
+          { value: "mapsForm", text: "I confirm the maps are in the prescribed form." }
+        ]
+      }) }}
+
+      {{ govukButton({ text: "Continue" }) }}
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+<script>
+  (function() {
+    var form = document.getElementById('upload-core-form');
+    if (!form) return;
+    function syncFileToHidden(fileInput) {
+      var syncToName = fileInput.getAttribute('data-sync-to');
+      if (!syncToName) return;
+      var hidden = form.querySelector('input[name="' + syncToName + '"][type="hidden"]');
+      if (!hidden) return;
+      hidden.value = fileInput.files.length ? fileInput.files[0].name : '';
+    }
+    form.addEventListener('change', function(e) {
+      if (e.target.type !== 'file') return;
+      syncFileToHidden(e.target);
+    });
+    form.addEventListener('submit', function() {
+      form.querySelectorAll('input[type="file"][data-sync-to]').forEach(syncFileToHidden);
+    });
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName = "Check your answers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/application/task-list"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-xl">Check your answers</h1>
+
+    <p class="govuk-body">Review the information you've provided. You can change any section before submitting your compulsory purchase order.</p>
+
+    {{ govukSummaryList({
+      card: {
+        title: { text: "Basic details" }
+      },
+      rows: [
+        {
+          key: { text: "Your reference" },
+          value: { text: data.yourReference or "Not provided" },
+          actions: { items: [{ href: "/application/setup", text: "Change", visuallyHiddenText: "your reference" }] }
+        },
+        {
+          key: { text: "Acquiring authority" },
+          value: { text: data.acquiringAuthority or "—" },
+          actions: { items: [{ href: "/application/setup", text: "Change", visuallyHiddenText: "acquiring authority" }] }
+        },
+        {
+          key: { text: "Statutory power" },
+          value: { text: data.statutoryPower or "—" },
+          actions: { items: [{ href: "/application/setup", text: "Change", visuallyHiddenText: "statutory power" }] }
+        },
+        {
+          key: { text: "Scheme name" },
+          value: { text: data.schemeName or "—" },
+          actions: { items: [{ href: "/application/setup", text: "Change", visuallyHiddenText: "scheme name" }] }
+        },
+        {
+          key: { text: "Scheme type" },
+          value: { text: data.schemeType or "—" },
+          actions: { items: [{ href: "/application/setup", text: "Change", visuallyHiddenText: "scheme type" }] }
+        },
+        {
+          key: { text: "Region or local authority" },
+          value: { text: data.localAuthority or "Not provided" },
+          actions: { items: [{ href: "/application/setup", text: "Change", visuallyHiddenText: "region or local authority" }] }
+        }
+      ]
+    }) }}
+
+    {{ govukSummaryList({
+      card: {
+        title: { text: "Upload core documents" }
+      },
+      rows: [
+        {
+          key: { text: "Made CPO" },
+          value: { text: data.coreOrderDocument or "—" },
+          actions: { items: [{ href: "/application/upload-core-documents", text: "Change", visuallyHiddenText: "core documents" }] }
+        },
+        {
+          key: { text: "Order map or maps" },
+          value: { text: data.coreMapDocument or "—" },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Statement of Reasons" },
+          value: { text: data.coreStatementOfReasons or "—" },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Supporting documents" },
+          value: { text: data.coreSupportingDocuments or "Not provided" },
+          actions: { items: [] }
+        }
+      ]
+    }) }}
+
+    {% set planningStatusLabels = { granted: "Granted", pending: "Pending", "not-required": "Not required", other: "Other" } %}
+    {% set planningStatusText = planningStatusLabels[data.planningStatus] or "—" %}
+    {% set envText = (data.environmentalImpactRequired == "yes") and "Yes" or ((data.environmentalImpactRequired == "no") and "No" or "—") %}
+
+    {{ govukSummaryList({
+      card: {
+        title: { text: "Planning and environmental" }
+      },
+      rows: [
+        {
+          key: { text: "Planning permission status" },
+          value: { text: planningStatusText },
+          actions: { items: [{ href: "/application/planning-and-environmental", text: "Change", visuallyHiddenText: "planning and environmental" }] }
+        },
+        {
+          key: { text: "Planning decision notice" },
+          value: { text: data.planningDecisionDocument or "—" },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Committee report" },
+          value: { text: data.planningCommitteeReport or "Not provided" },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Environmental impact assessment required" },
+          value: { text: envText },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Environmental document" },
+          value: { text: data.environmentalDocument or "—" },
+          actions: { items: [] }
+        }
+      ]
+    }) }}
+
+    {{ govukSummaryList({
+      card: {
+        title: { text: "Notices and service evidence" }
+      },
+      rows: [
+        {
+          key: { text: "Required notices served" },
+          value: { text: (data.noticesServed == "yes") and "Yes" or ((data.noticesServed == "no") and "No" or "—") },
+          actions: { items: [{ href: "/application/notices-and-service-evidence", text: "Change", visuallyHiddenText: "notices and service evidence" }] }
+        },
+        {
+          key: { text: "Template notice" },
+          value: { text: data.templateNoticeDocument or "—" },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Certificate of service" },
+          value: { text: data.certificateOfServiceDocument or "—" },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Newspaper publication" },
+          value: { text: data.newspaperPublicationDocument or "—" },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Site notice" },
+          value: { text: data.siteNoticeDocument or "—" },
+          actions: { items: [] }
+        }
+      ]
+    }) }}
+
+    {{ govukSummaryList({
+      card: {
+        title: { text: "Contacts and access" }
+      },
+      rows: [
+        {
+          key: { text: "Name" },
+          value: { text: data.primaryContactName or "—" },
+          actions: { items: [{ href: "/application/contacts-and-access", text: "Change", visuallyHiddenText: "contacts and access" }] }
+        },
+        {
+          key: { text: "Email" },
+          value: { text: data.primaryContactEmail or "—" },
+          actions: { items: [] }
+        },
+        {
+          key: { text: "Phone" },
+          value: { text: data.primaryContactPhone or "Not provided" },
+          actions: { items: [] }
+        }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Declaration</h2>
+    <p class="govuk-body">I confirm I've read and understood the information I've provided, and that it's accurate to the best of my knowledge.</p>
+
+    <form class="form" action="/application/check-answers" method="post" novalidate>
+      {{ govukButton({ text: "Continue" }) }}
+    </form>
+
+  </div>
+</div>
+{% endblock %}
